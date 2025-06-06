@@ -1,52 +1,60 @@
-create table users(
-id int auto_increment primary key,
-username varchar(255),
-password varchar(255),
-coins INT DEFAULT 0);
+-- USERS TABLE
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    coins INT DEFAULT 0
+);
 
+-- LEADERBOARD
 CREATE TABLE leaderboard (
-entry_id INT AUTO_INCREMENT PRIMARY KEY,
-user_id INT,
-highest_score INT,
-average_wpm FLOAT,
-average_accuracy FLOAT,
-FOREIGN KEY (user_id) REFERENCES users (id)
+    entry_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    highest_score INT NOT NULL,
+    average_wpm FLOAT NOT NULL,
+    average_accuracy FLOAT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- GAME RESULTS
 CREATE TABLE game_results (
-game_id INT AUTO_INCREMENT PRIMARY KEY,
-user_id INT,
-score INT,
-wpm FLOAT,
-accuracy FLOAT,
-played_at DATETIME,
-FOREIGN KEY (user_id) REFERENCES users(id)
+    game_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    score INT NOT NULL,
+    wpm FLOAT NOT NULL,
+    accuracy FLOAT NOT NULL,
+    played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- STORE ITEMS
 CREATE TABLE store_items (
-item_id INT AUTO_INCREMENT PRIMARY KEY,
-item_name VARCHAR(255),
-item_description VARCHAR(500),
-price INT
-); 
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    item_name VARCHAR(255) NOT NULL,
+    item_description VARCHAR(500),
+    price INT NOT NULL
+);
 
 INSERT INTO store_items (item_name, item_description, price)
 VALUES ('Xtra Life', 'The user will be given another chance to continue the game.', 10);
 
+-- USER PURCHASES
 CREATE TABLE user_purchases (
-purchase_id INT AUTO_INCREMENT PRIMARY KEY,
-user_id INT,
-item_id INT,
-purchased_at DATETIME,
-FOREIGN KEY (user_id) REFERENCES users(id),
-FOREIGN KEY (item_id) REFERENCES store_items(item_id)
+    purchase_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    item_id INT NOT NULL,
+    purchased_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (item_id) REFERENCES store_items(item_id)
 );
 
+-- USER INVENTORY
 CREATE TABLE user_inventory (
-inventory_id INT AUTO_INCREMENT PRIMARY KEY,
-user_id INT,
-item_id INT,
-quantity INT DEFAULT 0,
-FOREIGN KEY (user_id) REFERENCES users(id),
-FOREIGN KEY (item_id) REFERENCES store_items(item_id)
+    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    item_id INT NOT NULL,
+    quantity INT DEFAULT 0 NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (item_id) REFERENCES store_items(item_id),
+    UNIQUE(user_id, item_id) -- Prevent duplicate entries for the same user and item
 );
